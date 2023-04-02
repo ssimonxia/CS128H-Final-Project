@@ -1,0 +1,12 @@
+C:\Users\x2421\Desktop\CS128H_Final_Project\win-keylogger-rs\target\debug\deps\os_info-2ed123783abccd45.rmeta: C:\Users\x2421\.cargo\registry\src\github.com-1ecc6299db9ec823\os_info-1.1.0\src\lib.rs C:\Users\x2421\.cargo\registry\src\github.com-1ecc6299db9ec823\os_info-1.1.0\src\windows\mod.rs C:\Users\x2421\.cargo\registry\src\github.com-1ecc6299db9ec823\os_info-1.1.0\src\windows\winapi.rs C:\Users\x2421\.cargo\registry\src\github.com-1ecc6299db9ec823\os_info-1.1.0\src\info.rs C:\Users\x2421\.cargo\registry\src\github.com-1ecc6299db9ec823\os_info-1.1.0\src\os_type.rs C:\Users\x2421\.cargo\registry\src\github.com-1ecc6299db9ec823\os_info-1.1.0\src\version.rs
+
+C:\Users\x2421\Desktop\CS128H_Final_Project\win-keylogger-rs\target\debug\deps\libos_info-2ed123783abccd45.rlib: C:\Users\x2421\.cargo\registry\src\github.com-1ecc6299db9ec823\os_info-1.1.0\src\lib.rs C:\Users\x2421\.cargo\registry\src\github.com-1ecc6299db9ec823\os_info-1.1.0\src\windows\mod.rs C:\Users\x2421\.cargo\registry\src\github.com-1ecc6299db9ec823\os_info-1.1.0\src\windows\winapi.rs C:\Users\x2421\.cargo\registry\src\github.com-1ecc6299db9ec823\os_info-1.1.0\src\info.rs C:\Users\x2421\.cargo\registry\src\github.com-1ecc6299db9ec823\os_info-1.1.0\src\os_type.rs C:\Users\x2421\.cargo\registry\src\github.com-1ecc6299db9ec823\os_info-1.1.0\src\version.rs
+
+C:\Users\x2421\Desktop\CS128H_Final_Project\win-keylogger-rs\target\debug\deps\os_info-2ed123783abccd45.d: C:\Users\x2421\.cargo\registry\src\github.com-1ecc6299db9ec823\os_info-1.1.0\src\lib.rs C:\Users\x2421\.cargo\registry\src\github.com-1ecc6299db9ec823\os_info-1.1.0\src\windows\mod.rs C:\Users\x2421\.cargo\registry\src\github.com-1ecc6299db9ec823\os_info-1.1.0\src\windows\winapi.rs C:\Users\x2421\.cargo\registry\src\github.com-1ecc6299db9ec823\os_info-1.1.0\src\info.rs C:\Users\x2421\.cargo\registry\src\github.com-1ecc6299db9ec823\os_info-1.1.0\src\os_type.rs C:\Users\x2421\.cargo\registry\src\github.com-1ecc6299db9ec823\os_info-1.1.0\src\version.rs
+
+C:\Users\x2421\.cargo\registry\src\github.com-1ecc6299db9ec823\os_info-1.1.0\src\lib.rs:
+C:\Users\x2421\.cargo\registry\src\github.com-1ecc6299db9ec823\os_info-1.1.0\src\windows\mod.rs:
+C:\Users\x2421\.cargo\registry\src\github.com-1ecc6299db9ec823\os_info-1.1.0\src\windows\winapi.rs:
+C:\Users\x2421\.cargo\registry\src\github.com-1ecc6299db9ec823\os_info-1.1.0\src\info.rs:
+C:\Users\x2421\.cargo\registry\src\github.com-1ecc6299db9ec823\os_info-1.1.0\src\os_type.rs:
+C:\Users\x2421\.cargo\registry\src\github.com-1ecc6299db9ec823\os_info-1.1.0\src\version.rs:
