@@ -8,3 +8,9 @@ Technical Overview: The final project is composed of three parts -- creating a k
 
 Possible Challenges: There are a few possible challenges we may face when working on the project. First of all, as for the work of the keylogger, we may need to learn new UI or learn new knowledge, which may take some time. Secondly, as for the algorithms to analyze the results of the keylogger, it is hard to ensure the accuracy of the analysis, since different people have different habits to use keyboards and as for people who are not very familiar with the keyboard, the results will be hard to analyze. We may need to find a way to figure out this problem and improve the accuracy of the analysis. Besides, learning encryption and decryption algorithms may be challenging even a simple algorithm. New math knowledge is required. 
 
+Reference:
+I have got some ideas about how to create a keylogger from here https://github.com/thomaslienbacher/win-keylogger-rs.git.
+Learn how to use winapi here https://docs.rs/winapi/latest/winapi/.
+Learn how to use std::os and std::fs here https://doc.rust-lang.org/std/ and https://docs.rs/os_info/latest/os_info/
+Some infomation about unsafe https://doc.rust-lang.org/rust-by-example/unsafe.html#:~:text=Unsafe%20annotations%20in%20Rust%20are%20used%20to%20bypass,modifying%20static%20mutable%20variables%204%20implementing%20unsafe%20traits
+Learn how to use locale here https://learn.microsoft.com/en-us/windows/win32/intl/locale-name-constants
